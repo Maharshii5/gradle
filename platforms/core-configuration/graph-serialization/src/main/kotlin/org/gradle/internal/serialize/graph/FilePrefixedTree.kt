@@ -65,6 +65,7 @@ class FilePrefixedTree {
      */
     fun compress(): Node = compressFrom(root)
 
+    // TODO validate again, simplify
     private fun compressFrom(node: Node): Node {
         if (node.isFinal) {
             return node.copy(children = node.children.compress())
@@ -73,13 +74,16 @@ class FilePrefixedTree {
         val segmentsToCompress = mutableListOf<String>()
         var current = node
 
-        while (current.children.size == 1 && current.singleChild.isIntermediate) {
+        while (current.children.size == 1) {
             segmentsToCompress.add(current.segment)
             current = current.singleChild
+            if (current.isFinal) break
         }
 
-        if (current.isIntermediate) {
-            segmentsToCompress.add(current.segment)
+        segmentsToCompress.add(current.segment)
+
+        if (current.isFinal) {
+            return Node(true, current.index, segmentsToCompress.compressPath(), current.children.compress())
         }
 
         return when (current.children.size) {
@@ -94,17 +98,18 @@ class FilePrefixedTree {
                 else -> Node(current.isFinal, current.index, segmentsToCompress.compressPath(), current.children.compress())
             }
 
-            else -> Node(current.isFinal, current.index, segmentsToCompress.compressPath(), current.children.compress())
+            else -> Node(false, current.index, segmentsToCompress.compressPath(), current.children.compress())
         }
     }
 
     private fun List<String>.compressPath(): String {
+        val pathSeparator = FilePathUtil.FILE_PATH_SEPARATORS
         val segments = dropWhile { it.isEmpty() }
-        val isAbsolute = segments.firstOrNull() == FilePathUtil.FILE_PATH_SEPARATORS
+        val isAbsolute = segments.firstOrNull() == pathSeparator
         return if (isAbsolute) {
-            FilePathUtil.FILE_PATH_SEPARATORS + segments.drop(0).joinToString(FilePathUtil.FILE_PATH_SEPARATORS)
+            pathSeparator + segments.dropWhile { it == pathSeparator }.joinToString(pathSeparator)
         } else {
-            segments.joinToString(FilePathUtil.FILE_PATH_SEPARATORS)
+            segments.joinToString(pathSeparator)
         }
     }
 

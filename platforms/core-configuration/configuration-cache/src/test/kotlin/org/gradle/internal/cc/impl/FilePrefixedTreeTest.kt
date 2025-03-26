@@ -18,65 +18,71 @@ package org.gradle.internal.cc.impl
 
 import org.gradle.internal.serialize.graph.FilePrefixedTree
 import org.junit.Assert.assertEquals
+import org.junit.Ignore
 import org.junit.Test
 import java.io.File
 
 class FilePrefixedTreeTest {
 
     @Test
-    fun `prefixed tree humble beginning`() {
-        val prefixedTree = FilePrefixedTree()
-        val fooIndex = prefixedTree.insert(File("org/example/foo/Foo"))
-        val barIndex = prefixedTree.insert(File("org/example/bar/Bar"))
-
-        val indexes = FilePrefixedTree.buildIndexes(prefixedTree.root)
-
-        assertEquals(File("/org/example/foo/Foo"), indexes[fooIndex])
-        assertEquals(File("/org/example/bar/Bar"), indexes[barIndex])
-    }
-
-    @Test
-    fun `prefixify strings`() {
+    fun `can create prefixed tree of inserted files`() {
         val prefixedTree = FilePrefixedTree()
         prefixedTree.insert(File("org/example/foo/Foo"))
         prefixedTree.insert(File("org/example/bar")) // insert a dir
         prefixedTree.insert(File("org/example/bar/Bar"))
         prefixedTree.insert(File("org/example/bar/Bar1"))
 
-        val expectedTree = FilePrefixedTree.Node(
-            false, 0, "",
-            mutableMapOf(
-                "org" to FilePrefixedTree.Node(
-                    false, 1, "org",
-                    mutableMapOf(
-                        "example" to FilePrefixedTree.Node(
-                            false, 2, "example",
-                            mutableMapOf(
-                                "foo" to FilePrefixedTree.Node(
-                                    false, 3, "foo",
-                                    mutableMapOf(
-                                        "Foo" to FilePrefixedTree.Node(
-                                            true, 4, "Foo",
-                                        )
-                                    )
-                                ),
-                                "bar" to FilePrefixedTree.Node(
-                                    true, 5, "bar",
-                                    mutableMapOf(
-                                        "Bar" to FilePrefixedTree.Node(
-                                            true, 6, "Bar",
-                                        ),
-                                        "Bar1" to FilePrefixedTree.Node(
-                                            true, 7, "Bar1",
-                                        )
-                                    )
-                                )
+        val expectedTree =
+            root(
+                intermediateNode(
+                    "org", 1,
+                    intermediateNode(
+                        "example", 2,
+                        intermediateNode(
+                            "foo", 3,
+                            finalNode("Foo", 4)
+                        ),
+                        finalNode(
+                            "bar", 5,
+                            finalNode("Bar", 6),
+                            finalNode("Bar1", 7)
+                        )
+                    )
+                )
+            )
+
+        assertEquals(expectedTree, prefixedTree.root)
+    }
+
+    @Test
+    fun `absolute paths and relative paths in the same tree are supported`() {
+        val prefixedTree = FilePrefixedTree()
+        prefixedTree.insert(File("org/example/Foo"))
+        prefixedTree.insert(File("/org/example/bar/Bar"))
+
+        val expectedTree =
+            root(
+                intermediateNode(
+                    "org", 1,
+                    intermediateNode(
+                        "example", 2,
+                        finalNode("Foo", 3)
+                    )
+                ),
+                intermediateNode(
+                    "/", 4,
+                    intermediateNode(
+                        "org", 5,
+                        intermediateNode(
+                            "example", 6,
+                            intermediateNode(
+                                "bar", 7,
+                                finalNode("Bar", 8)
                             )
                         )
                     )
                 )
             )
-        )
 
         assertEquals(expectedTree, prefixedTree.root)
     }
@@ -84,39 +90,30 @@ class FilePrefixedTreeTest {
     @Test
     fun `tree is compressable`() {
         val prefixedTree = FilePrefixedTree()
-        prefixedTree.insert(File("org/example/company/foo/Foo"))
-        prefixedTree.insert(File("org/example/company/bar/Bar"))
+        prefixedTree.insert(File("/org/example/company/foo/Foo"))
+        prefixedTree.insert(File("/org/example/company/bar/Bar"))
+        prefixedTree.insert(File("/org/example/company/bar/Bar1"))
+        prefixedTree.insert(File("org/example/company/bar"))
+        prefixedTree.insert(File("org/example/company/bar/Bar2"))
+        prefixedTree.insert(File("/org/example/company/baz/Baz"))
 
-        val expectedCompressedTree = FilePrefixedTree.Node(
-            false, 3, "org/example/company",
-            mutableMapOf(
-                "foo/Foo" to FilePrefixedTree.Node(true, 5, "foo/Foo"),
-                "bar/Bar" to FilePrefixedTree.Node(true, 7, "bar/Bar")
-            )
-        )
-
-        assertEquals(expectedCompressedTree, prefixedTree.compress())
-    }
-
-    @Test
-    fun `inserted dirs are not compressable`() {
-        val prefixedTree = FilePrefixedTree()
-        prefixedTree.insert(File("org/example/company/foo"))
-        prefixedTree.insert(File("org/example/company/foo/bar/zum/Zum"))
-
-        val expectedCompressedTree = FilePrefixedTree.Node(
-            false, 3, "org/example/company",
-            mutableMapOf(
-                "foo" to FilePrefixedTree.Node(
-                    true, 4, "foo",
-                    mutableMapOf(
-                        "bar/zum/Zum" to FilePrefixedTree.Node(
-                            true, 7, "bar/zum/Zum",
-                        )
-                    )
+        val expectedCompressedTree =
+            root(
+                finalNode(
+                    "org/example/company/bar", 13,
+                    finalNode("Bar2", 14)
                 ),
+                intermediateNode(
+                    "/org/example/company", 4,
+                    finalNode("baz/Baz", 16),
+                    intermediateNode(
+                        "bar", 7,
+                        finalNode("Bar1", 9),
+                        finalNode("Bar", 8),
+                    ),
+                    finalNode("foo/Foo", 6)
+                )
             )
-        )
 
         assertEquals(expectedCompressedTree, prefixedTree.compress())
     }
@@ -129,8 +126,8 @@ class FilePrefixedTreeTest {
 
         val indexes = FilePrefixedTree.buildIndexes(prefixedTree.compress())
 
-        assertEquals(File("/org/example/foo/Foo"), indexes[fooIndex])
-        assertEquals(File("/org/example/bar/Bar"), indexes[barIndex])
+        assertEquals(File("org/example/foo/Foo"), indexes[fooIndex])
+        assertEquals(File("org/example/bar/Bar"), indexes[barIndex])
     }
 
     @Test
@@ -142,4 +139,16 @@ class FilePrefixedTreeTest {
 
         assertEquals(foo1Index, foo2Index)
     }
+
+    private fun node(isFinal: Boolean, index: Int, segment: String, vararg children: FilePrefixedTree.Node) =
+        FilePrefixedTree.Node(isFinal, index, segment, children.associateBy { it.segment }.toMutableMap())
+
+    private fun finalNode(segment: String, index: Int, vararg children: FilePrefixedTree.Node) =
+        node(true, index, segment, *children)
+
+    private fun intermediateNode(segment: String, index: Int, vararg children: FilePrefixedTree.Node) =
+        node(false, index, segment, *children)
+
+    private fun root(vararg children: FilePrefixedTree.Node) =
+        intermediateNode("", 0, *children)
 }
