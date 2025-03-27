@@ -26,13 +26,11 @@ import org.openjdk.jmh.annotations.OutputTimeUnit
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
-import org.openjdk.jmh.annotations.TearDown
 import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.io.File
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.concurrent.TimeUnit
 import java.util.stream.Collectors
 
@@ -44,17 +42,17 @@ import java.util.stream.Collectors
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 open class FilePrefixedTreeBenchmark {
 
-    private lateinit var fileTree: Path
     private lateinit var filesToInsert: List<File>
+    private lateinit var fileTree: Path
 
     @Setup(Level.Trial)
     fun setup() {
-        fileTree = Paths.get("tree")
-        generateFileTree(fileTree, 7, 7) // ~800k nodes
+        fileTree = Files.createTempDirectory("tree")
+        generateFileTree(fileTree, 7, 7) // 137257 nodes
         filesToInsert = Files.walk(fileTree).map { it.toFile() }.collect(Collectors.toList())
     }
 
-    @TearDown(Level.Trial)
+    @Setup(Level.Trial)
     fun tearDown() {
         fileTree.toFile().deleteRecursively()
     }
