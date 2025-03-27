@@ -26,6 +26,7 @@ import org.openjdk.jmh.annotations.OutputTimeUnit
 import org.openjdk.jmh.annotations.Scope
 import org.openjdk.jmh.annotations.Setup
 import org.openjdk.jmh.annotations.State
+import org.openjdk.jmh.annotations.Threads
 import org.openjdk.jmh.annotations.Warmup
 import org.openjdk.jmh.infra.Blackhole
 import java.io.File
@@ -40,7 +41,7 @@ import java.util.stream.Collectors
 @State(Scope.Benchmark)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
-open class FilePrefixedTreeBenchmark {
+open class FilePrefixedTreeInsertionBenchmark {
 
     private lateinit var filesToInsert: List<File>
     private lateinit var fileTree: Path
@@ -57,17 +58,9 @@ open class FilePrefixedTreeBenchmark {
         fileTree.toFile().deleteRecursively()
     }
 
-    private fun generateFileTree(root: Path, depth: Int, width: Int) {
-        if (depth == 0) return
-        Files.createDirectories(root)
-
-        for (i in 1..width) {
-            val sub = root.resolve("sub_$i")
-            generateFileTree(sub, depth - 1, width)
-        }
-    }
-
+    // avgt   10  104.991 ± 0.719  ms/op
     @Benchmark
+    @Threads(4)
     fun prefixedTreeInsert(bh: Blackhole) {
         val prefixedTree = FilePrefixedTree()
         filesToInsert.forEach { bh.consume(prefixedTree.insert(it)) }
