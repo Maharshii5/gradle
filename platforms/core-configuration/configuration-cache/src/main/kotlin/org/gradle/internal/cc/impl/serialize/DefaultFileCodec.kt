@@ -16,13 +16,12 @@
 
 package org.gradle.internal.cc.impl.serialize
 
-import org.gradle.internal.file.FilePathUtil
 import org.gradle.internal.serialize.graph.CloseableReadContext
 import org.gradle.internal.serialize.graph.CloseableWriteContext
-import org.gradle.internal.serialize.graph.FilePrefixedTree
-import org.gradle.internal.serialize.graph.FilePrefixedTree.Node
 import org.gradle.internal.serialize.graph.FileDecoder
 import org.gradle.internal.serialize.graph.FileEncoder
+import org.gradle.internal.serialize.graph.FilePrefixedTree
+import org.gradle.internal.serialize.graph.FilePrefixedTree.Node
 import org.gradle.internal.serialize.graph.ReadContext
 import org.gradle.internal.serialize.graph.WriteContext
 import java.io.File
@@ -120,7 +119,7 @@ class DefaultFileDecoder(
 
                 val path = parent?.let {
                     val parentSegment = segments[it]
-                    if (parentSegment.isNullOrEmpty()) segment else "$parentSegment${FilePathUtil.FILE_PATH_SEPARATORS}$segment"
+                    if (parentSegment.isNullOrEmpty()) segment else "$parentSegment${File.separatorChar}$segment"
                 } ?: segment
 
                 segments[id] = path

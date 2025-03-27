@@ -16,7 +16,6 @@
 
 package org.gradle.internal.serialize.graph
 
-import org.gradle.internal.file.FilePathUtil
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
@@ -41,20 +40,25 @@ class FilePrefixedTree {
      * If the path already exists, returns the existing index.
      * */
     fun insert(file: File): Int {
-        val segments = file.path.split(FilePathUtil.FILE_PATH_SEPARATORS)
+        val segmentBuilder = StringBuilder()
         var current = root
 
-        for (segment in segments) {
-            val childSegment = segment.ifEmpty {
-                // leading separator
-                FilePathUtil.FILE_PATH_SEPARATORS
+        for (char in file.path) {
+            if (char == File.separatorChar) {
+                val childSegment = segmentBuilder.ifEmpty { /* leading separator for absolute file */ File.separator }.toString()
+                current = current.children.computeIfAbsent(childSegment) { Node(false, currentIndex.getAndIncrement(), childSegment) }
+                segmentBuilder.clear()
+                continue
             }
+            segmentBuilder.append(char)
+        }
 
+        if (segmentBuilder.isNotEmpty()) {
+            val childSegment = segmentBuilder.toString()
             current = current.children.computeIfAbsent(childSegment) { Node(false, currentIndex.getAndIncrement(), childSegment) }
         }
 
         current.isFinal = true
-
         return current.index
     }
 
@@ -103,13 +107,12 @@ class FilePrefixedTree {
     }
 
     private fun List<String>.compressPath(): String {
-        val pathSeparator = FilePathUtil.FILE_PATH_SEPARATORS
         val segments = dropWhile { it.isEmpty() }
-        val isAbsolute = segments.firstOrNull() == pathSeparator
+        val isAbsolute = segments.firstOrNull() == File.separator
         return if (isAbsolute) {
-            pathSeparator + segments.dropWhile { it == pathSeparator }.joinToString(pathSeparator)
+            File.separator + segments.dropWhile { it == File.separator }.joinToString(File.separator)
         } else {
-            segments.joinToString(pathSeparator)
+            segments.joinToString(File.separator)
         }
     }
 
@@ -145,7 +148,7 @@ class FilePrefixedTree {
 
         private fun buildIndexFor(node: Node, segments: MutableList<String>, indexes: MutableMap<Int, File>) {
             segments.add(node.segment)
-            indexes[node.index] = File(segments.joinToString(FilePathUtil.FILE_PATH_SEPARATORS))
+            indexes[node.index] = File(segments.joinToString(File.separator))
             for (child in node.children.values) {
                 buildIndexFor(child, segments, indexes)
             }
