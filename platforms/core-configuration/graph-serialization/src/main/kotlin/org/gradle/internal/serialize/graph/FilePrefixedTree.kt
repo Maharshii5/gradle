@@ -65,15 +65,11 @@ class FilePrefixedTree {
      * Compresses the current tree following the <a href="http://en.wikipedia.org/wiki/Radix_tree">Radix tree</a> idea.
      * <p>
      * Tree should be compressed only after all insertions are completed.
+     * @return a new tree, which is a compressed version of the current one.
      */
     fun compress(): Node = compressFrom(root)
 
-    // TODO validate again, simplify
     private fun compressFrom(node: Node): Node {
-        if (node.isFinal) {
-            return node.copy(children = node.children.compress())
-        }
-
         val segmentsToCompress = mutableListOf<String>()
         var current = node
 
@@ -84,25 +80,7 @@ class FilePrefixedTree {
         }
 
         segmentsToCompress.add(current.segment)
-
-        if (current.isFinal) {
-            return Node(true, current.index, segmentsToCompress.compressPath(), current.children.compress())
-        }
-
-        return when (current.children.size) {
-            0 -> Node(true, current.index, segmentsToCompress.compressPath())
-            1 -> when (current.singleChild.children.size) {
-                // final child
-                0 -> {
-                    segmentsToCompress.add(current.singleChild.segment)
-                    Node(true, current.singleChild.index, segmentsToCompress.compressPath())
-                }
-
-                else -> Node(current.isFinal, current.index, segmentsToCompress.compressPath(), current.children.compress())
-            }
-
-            else -> Node(false, current.index, segmentsToCompress.compressPath(), current.children.compress())
-        }
+        return Node(current.isFinal, current.index, segmentsToCompress.compressPath(), current.children.compress())
     }
 
     private fun List<String>.compressPath(): String {
@@ -124,9 +102,6 @@ class FilePrefixedTree {
         val segment: String,
         val children: MutableMap<String, Node> = ConcurrentHashMap()
     ) {
-        val isIntermediate
-            get() = !isFinal
-
         val singleChild
             get() = children.entries.single().value
 
