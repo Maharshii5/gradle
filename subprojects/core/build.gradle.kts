@@ -110,6 +110,7 @@ dependencies {
     api(projects.serviceProvider)
     api(projects.snapshots)
     api(projects.snapshotsWorker)
+    api(projects.softwareFeatures)
     api(projects.stdlibJavaExtensions)
     api(projects.time)
     api(projects.versionedCache)
