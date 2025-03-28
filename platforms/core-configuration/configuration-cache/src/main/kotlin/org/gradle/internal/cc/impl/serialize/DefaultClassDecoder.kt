@@ -39,7 +39,7 @@ class DefaultClassDecoder(
     private
     val scopes = ReadIdentities()
 
-    override fun ReadContext.decodeClass(): Class<*> {
+    override fun Decoder.decodeClass(): Class<*> {
         val id = readSmallInt()
         val type = classes.getInstance(id)
         if (type != null) {
@@ -54,7 +54,7 @@ class DefaultClassDecoder(
         return actualType
     }
 
-    override fun ReadContext.decodeClassLoader(): ClassLoader? =
+    override fun Decoder.decodeClassLoader(): ClassLoader? =
         if (readBoolean()) {
             val scope = readScope()
             if (readBoolean()) {
@@ -67,7 +67,7 @@ class DefaultClassDecoder(
         }
 
     private
-    fun ReadContext.readScope(): ClassLoaderScope {
+    fun Decoder.readScope(): ClassLoaderScope {
         val id = readSmallInt()
         val scope = scopes.getInstance(id)
         if (scope != null) {

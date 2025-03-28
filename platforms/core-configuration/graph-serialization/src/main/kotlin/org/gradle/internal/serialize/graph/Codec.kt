@@ -60,8 +60,6 @@ interface WriteContext : MutableIsolateContext, Encoder {
 
     suspend fun <T : Any> writeSharedObject(value: T, encode: suspend WriteContext.(T) -> Unit)
 
-    override fun writeFile(file: File)
-
     fun writeClass(type: Class<*>)
 
     /**
@@ -108,8 +106,6 @@ interface ReadContext : IsolateContext, MutableIsolateContext, Decoder {
     var immediateMode: Boolean // TODO:configuration-cache prevent StackOverflowErrors when crossing protocols
 
     suspend fun read(): Any?
-
-    override fun readFile(): File
 
     suspend fun <T : Any> readSharedObject(decode: suspend ReadContext.() -> T): T
 

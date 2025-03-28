@@ -157,14 +157,14 @@ interface ClassEncoder {
 
 
 interface ClassDecoder {
-    fun ReadContext.decodeClass(): Class<*>
+    fun Decoder.decodeClass(): Class<*>
 
     /**
      * Decodes a [ClassLoader] previously encoded via [ClassEncoder.encodeClassLoader].
      *
      * @return the previously encoded [ClassLoader] or `null` when [ClassEncoder.encodeClassLoader] returns `false`
      */
-    fun ReadContext.decodeClassLoader(): ClassLoader? = null
+    fun Decoder.decodeClassLoader(): ClassLoader? = null
 }
 
 

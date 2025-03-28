@@ -17,6 +17,7 @@
 package org.gradle.internal.serialize;
 
 import org.jspecify.annotations.Nullable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -126,6 +127,9 @@ public interface Encoder {
      */
     void writeNullableString(@Nullable CharSequence value) throws IOException;
 
+    /**
+     * Writes a file.
+     */
     void writeFile(File file) throws IOException;
 
     interface EncodeAction<T> {

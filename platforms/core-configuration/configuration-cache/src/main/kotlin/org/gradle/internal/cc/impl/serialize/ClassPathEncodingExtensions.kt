@@ -19,7 +19,7 @@ package org.gradle.internal.cc.impl.serialize
 import org.gradle.internal.classpath.ClassPath
 import org.gradle.internal.classpath.DefaultClassPath
 import org.gradle.internal.classpath.TransformedClassPath
-import org.gradle.internal.serialize.graph.ReadContext
+import org.gradle.internal.serialize.Decoder
 import org.gradle.internal.serialize.graph.WriteContext
 import org.gradle.internal.serialize.graph.writeCollection
 
@@ -56,7 +56,7 @@ fun WriteContext.writeTransformedClassPath(classPath: TransformedClassPath) {
 
 
 internal
-fun ReadContext.readClassPath(): ClassPath {
+fun Decoder.readClassPath(): ClassPath {
     val isTransformed = readBoolean()
     return if (isTransformed) {
         readTransformedClassPath()
@@ -67,7 +67,7 @@ fun ReadContext.readClassPath(): ClassPath {
 
 
 private
-fun ReadContext.readDefaultClassPath(): ClassPath {
+fun Decoder.readDefaultClassPath(): ClassPath {
     val size = readSmallInt()
     val builder = DefaultClassPath.builderWithExactSize(size)
     repeat(size) {
@@ -78,14 +78,11 @@ fun ReadContext.readDefaultClassPath(): ClassPath {
 
 
 private
-fun ReadContext.readTransformedClassPath(): ClassPath {
+fun Decoder.readTransformedClassPath(): ClassPath {
     val size = readSmallInt()
     val builder = TransformedClassPath.builderWithExactSize(size)
     repeat(size) {
-        builder.add(
-            readFile(),
-            readFile()
-        )
+        builder.add(readFile(), readFile())
     }
     return builder.build()
 }

@@ -145,6 +145,11 @@ public interface Decoder {
      */
     byte[] readBinary() throws EOFException, IOException;
 
+    /**
+     * Reads a file.
+     *
+     * @throws EOFException when the end of the byte stream is reached before the file can be fully read.
+     */
     File readFile() throws EOFException, IOException;
 
     /**
