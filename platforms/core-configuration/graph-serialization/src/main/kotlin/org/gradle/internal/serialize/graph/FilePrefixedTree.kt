@@ -70,6 +70,10 @@ class FilePrefixedTree {
     fun compress(): Node = compressFrom(root)
 
     private fun compressFrom(node: Node): Node {
+        if (node.isFinal) {
+            return node.copy(children = node.children.compress())
+        }
+
         val segmentsToCompress = mutableListOf<String>()
         var current = node
 
