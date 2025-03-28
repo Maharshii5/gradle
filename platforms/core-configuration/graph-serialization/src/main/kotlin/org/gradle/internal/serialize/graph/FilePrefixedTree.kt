@@ -21,8 +21,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 
 /**
- * An implementation of space-optimized prefix tree for files.
- * Because of the space optimization focus, the effective lookup is possible only after building indexes table.
+ * An implementation of <a href="https://en.wikipedia.org/wiki/Trie">Prefix tree</a> for files.
  * <p>
  * The tree can be compressed. The compressing factor is totally depends on the structure of the tree.
  */
@@ -38,7 +37,7 @@ class FilePrefixedTree {
      *
      * @return the index of the final node representing the file.
      * If the path already exists, returns the existing index.
-     * */
+     */
     fun insert(file: File): Int {
         val segmentBuilder = StringBuilder()
         var current = root

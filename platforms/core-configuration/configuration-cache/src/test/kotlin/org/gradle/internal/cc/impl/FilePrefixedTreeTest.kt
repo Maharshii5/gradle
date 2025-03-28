@@ -39,12 +39,18 @@ class FilePrefixedTreeTest {
                         "example", 2,
                         intermediateNode(
                             "foo", 3,
-                            finalNode("Foo", 4)
+                            finalNode(
+                                "Foo", 4
+                            )
                         ),
                         finalNode(
                             "bar", 5,
-                            finalNode("Bar", 6),
-                            finalNode("Bar1", 7)
+                            finalNode(
+                                "Bar", 6
+                            ),
+                            finalNode(
+                                "Bar1", 7
+                            )
                         )
                     )
                 )
@@ -65,7 +71,9 @@ class FilePrefixedTreeTest {
                     "org", 1,
                     intermediateNode(
                         "example", 2,
-                        finalNode("Foo", 3)
+                        finalNode(
+                            "Foo", 3
+                        )
                     )
                 ),
                 intermediateNode(
@@ -76,7 +84,9 @@ class FilePrefixedTreeTest {
                             "example", 6,
                             intermediateNode(
                                 "bar", 7,
-                                finalNode("Bar", 8)
+                                finalNode(
+                                    "Bar", 8
+                                )
                             )
                         )
                     )
@@ -100,17 +110,25 @@ class FilePrefixedTreeTest {
             root(
                 finalNode(
                     "org/example/company/bar", 13,
-                    finalNode("Bar2", 14)
+                    finalNode(
+                        "Bar2", 14
+                    )
                 ),
                 intermediateNode(
                     "/org/example/company", 4,
                     finalNode("baz/Baz", 16),
                     intermediateNode(
                         "bar", 7,
-                        finalNode("Bar1", 9),
-                        finalNode("Bar", 8),
+                        finalNode(
+                            "Bar1", 9
+                        ),
+                        finalNode(
+                            "Bar", 8
+                        ),
                     ),
-                    finalNode("foo/Foo", 6)
+                    finalNode(
+                        "foo/Foo", 6
+                    )
                 )
             )
 
@@ -118,7 +136,7 @@ class FilePrefixedTreeTest {
     }
 
     @Test
-    fun `indexes are valid after compression`() {
+    fun `indexes are preserved after compression`() {
         val prefixedTree = FilePrefixedTree()
         val fooIndex = prefixedTree.insert(File("org/example/foo/Foo"))
         val barIndex = prefixedTree.insert(File("org/example/bar/Bar"))
