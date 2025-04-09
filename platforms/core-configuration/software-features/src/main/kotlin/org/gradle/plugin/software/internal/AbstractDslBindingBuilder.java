@@ -33,8 +33,8 @@ abstract public class AbstractDslBindingBuilder implements DslBindingBuilder {
     @Nullable private Class<?> implementationType;
     @Nullable protected SoftwareFeatureTransform<?, ?, ?> transform;
 
-    private static <T> SoftwareFeatureDslBinding<T> bindingOf(Class<T> dslType, @Nullable Class<? extends T> implementationType, Path path, Class<?> bindingTargetType, Class<?> buildModelType, SoftwareFeatureTransform<T, ?, ?> transform) {
-        return new SoftwareFeatureDslBinding<T>() {
+    private static <T> SoftwareFeatureDslBinding bindingOf(Class<T> dslType, @Nullable Class<? extends T> implementationType, Path path, Class<?> bindingTargetType, Class<?> buildModelType, SoftwareFeatureTransform<T, ?, ?> transform) {
+        return new SoftwareFeatureDslBinding() {
             @Override
             public Class<?> getBindingTargetType() {
                 return bindingTargetType;
@@ -46,7 +46,7 @@ abstract public class AbstractDslBindingBuilder implements DslBindingBuilder {
             }
 
             @Override
-            public Optional<Class<? extends T>> getImplementationType() {
+            public Optional<Class<?>> getImplementationType() {
                 return Optional.ofNullable(implementationType);
             }
 
@@ -74,7 +74,7 @@ abstract public class AbstractDslBindingBuilder implements DslBindingBuilder {
     }
 
     @Override
-    public SoftwareFeatureDslBinding<?> build() {
+    public SoftwareFeatureDslBinding build() {
         if (dslType == null) {
             throw new IllegalStateException("No binding has been specified please call bind() first");
         }

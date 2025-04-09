@@ -106,7 +106,7 @@ public class DefaultSoftwareFeatureRegistry implements SoftwareFeatureRegistry {
                     // throw new IllegalArgumentException("Method annotated with @SoftwareType must be static: " + method);
                     return;
                 }
-                SoftwareFeatureDslBinding<?> softwareFeatureDslBinding;
+                SoftwareFeatureDslBinding softwareFeatureDslBinding;
                 try {
                     softwareFeatureDslBinding = Cast.uncheckedNonnullCast(field.get(pluginClass));
                 } catch (IllegalAccessException e) {

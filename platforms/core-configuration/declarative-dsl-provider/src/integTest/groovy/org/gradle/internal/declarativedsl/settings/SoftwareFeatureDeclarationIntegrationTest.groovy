@@ -64,7 +64,7 @@ class SoftwareFeatureDeclarationIntegrationTest extends AbstractIntegrationSpec 
 
             public class SoftwareFeatureImplPlugin implements Plugin<Project> {
                 @SoftwareFeature
-                public static SoftwareFeatureDslBinding<FeatureDefinition> binding = softwareFeature(FeatureDefinition.class, builder -> builder
+                public static SoftwareFeatureDslBinding binding = softwareFeature(builder -> builder
                         .bind("feature", FeatureDefinition.class, TestSoftwareTypeExtension.class, FeatureModel.class,
                             (context, feature, parent, model) -> {
                                 model.getText().set(feature.getText());

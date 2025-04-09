@@ -16,6 +16,7 @@
 
 package org.gradle.plugin.software.internal;
 
+import org.gradle.api.Action;
 import org.gradle.api.internal.plugins.SoftwareFeatureDslBindingBuilder;
 import org.gradle.api.internal.plugins.SoftwareFeatureTransform;
 import org.gradle.util.Path;
@@ -31,4 +32,8 @@ public class DefaultSoftwareFeatureDslBindingBuilder extends AbstractDslBindingB
         return this;
     }
 
+    public SoftwareFeatureDslBindingBuilder apply(Action<SoftwareFeatureDslBindingBuilder> configuration) {
+        configuration.execute(this);
+        return this;
+    }
 }

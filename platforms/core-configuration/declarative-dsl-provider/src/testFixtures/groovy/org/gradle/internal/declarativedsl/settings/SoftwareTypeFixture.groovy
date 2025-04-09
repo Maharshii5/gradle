@@ -412,7 +412,7 @@ trait SoftwareTypeFixture {
                 }
 
                 @SoftwareType
-                public static SoftwareFeatureDslBinding<${dslTypeClassName}> binding = softwareType(${dslTypeClassName}.class, builder ->
+                public static SoftwareFeatureDslBinding binding = softwareType(builder ->
                     builder.bind("${softwareType}", ${dslTypeClassName}.class, ModelType.class, (context, definition, model) -> {
                         System.out.println("Binding " + ${dslTypeClassName}.class.getSimpleName());
                     })

@@ -24,21 +24,21 @@ import org.gradle.util.Path;
 
 import java.util.Optional;
 
-public interface SoftwareFeatureDslBinding<T> {
+public interface SoftwareFeatureDslBinding {
     Class<?> getBindingTargetType();
-    Class<T> getDslType();
-    Optional<Class<? extends T>> getImplementationType();
+    Class<?> getDslType();
+    Optional<Class<?>> getImplementationType();
     Class<?> getBuildModelType();
     Path getPath();
-    SoftwareFeatureTransform<T, ?, ?> getTransform();
+    SoftwareFeatureTransform<?, ?, ?> getTransform();
 
-    static <T> SoftwareFeatureDslBinding<T> softwareFeature(Class<T> dslType, Action<SoftwareFeatureDslBindingBuilder> configuration) {
+    static SoftwareFeatureDslBinding softwareFeature(Action<SoftwareFeatureDslBindingBuilder> configuration) {
         DefaultSoftwareFeatureDslBindingBuilder builder = new DefaultSoftwareFeatureDslBindingBuilder();
         configuration.execute(builder);
         return Cast.uncheckedCast(builder.build());
     }
 
-    static <T> SoftwareFeatureDslBinding<T> softwareType(Class<T> dslType, Action<SoftwareTypeDslBindingBuilder> configuration) {
+    static SoftwareFeatureDslBinding softwareType(Action<SoftwareTypeDslBindingBuilder> configuration) {
         DefaultSoftwareTypeDslBindingBuilder builder = new DefaultSoftwareTypeDslBindingBuilder();
         configuration.execute(builder);
         return Cast.uncheckedCast(builder.build());
