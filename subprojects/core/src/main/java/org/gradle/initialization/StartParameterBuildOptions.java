@@ -684,7 +684,7 @@ public class StartParameterBuildOptions extends BuildOptionSet<StartParameterInt
 
     public static class TaskGraphOption extends EnabledOnlyBooleanBuildOption<StartParameterInternal> {
         public TaskGraphOption() {
-            super(null, CommandLineOptionConfiguration.create("task-graph", "TBD")); //TODO
+            super(null, CommandLineOptionConfiguration.create("task-graph", "Print task graph instead of executing tasks."));
         }
 
         @Override

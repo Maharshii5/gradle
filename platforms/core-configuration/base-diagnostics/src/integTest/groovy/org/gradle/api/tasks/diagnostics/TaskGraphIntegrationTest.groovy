@@ -24,13 +24,20 @@ class TaskGraphIntegrationTest extends AbstractIntegrationSpec {
         given:
         settingsFile """rootProject.name = 'my-root'"""
         buildFile """
-            def leaf1 = tasks.register("leaf1")
+            def leaf1 = tasks.register("leaf1"){
+                doLast {
+                    println("I'm a task called leaf1")
+                }
+            }
             def leaf2 = tasks.register("leaf2")
             def middle = tasks.register("middle"){
                 dependsOn(leaf1, leaf2)
             }
             tasks.register("root"){
                 dependsOn(leaf1, middle)
+                doLast {
+                    println("I'm a task called root")
+                }
             }
         """
 
@@ -40,14 +47,15 @@ class TaskGraphIntegrationTest extends AbstractIntegrationSpec {
         then:
         outputContains("""
 Tasks graph for: root
-\\--- :root
-     +--- :leaf1
-     \\--- :middle
-          +--- :leaf1 (*)
-          \\--- :leaf2
+\\--- :root (org.gradle.api.DefaultTask)
+     +--- :leaf1 (org.gradle.api.DefaultTask)
+     \\--- :middle (org.gradle.api.DefaultTask)
+          +--- :leaf1 (org.gradle.api.DefaultTask) (*)
+          \\--- :leaf2 (org.gradle.api.DefaultTask)
 
 (*) - details omitted (listed previously)
 """)
+        outputDoesNotContain("I'm a task called")
     }
 
     def "shows simple graph of tasks with multiple roots"() {
@@ -73,13 +81,13 @@ Tasks graph for: root
         then:
         outputContains("""
 Tasks graph for: root r2
-+--- :root
-|    +--- :leaf1
-|    \\--- :middle
-|         +--- :leaf1 (*)
-|         \\--- :leaf2
-\\--- :root2
-     \\--- :leaf2 (*)
++--- :root (org.gradle.api.DefaultTask)
+|    +--- :leaf1 (org.gradle.api.DefaultTask)
+|    \\--- :middle (org.gradle.api.DefaultTask)
+|         +--- :leaf1 (org.gradle.api.DefaultTask) (*)
+|         \\--- :leaf2 (org.gradle.api.DefaultTask)
+\\--- :root2 (org.gradle.api.DefaultTask)
+     \\--- :leaf2 (org.gradle.api.DefaultTask) (*)
 
 (*) - details omitted (listed previously)
 """)
@@ -117,13 +125,13 @@ Tasks graph for: root r2
         then:
         outputContains("""
 Tasks graph for: root r2
-+--- :root
-|    +--- :leaf1
-|    \\--- :middle
-|         +--- :leaf1 (*)
-|         \\--- :leaf2
-\\--- :root2
-     \\--- other build task :included:fromIncluded
++--- :root (org.gradle.api.DefaultTask)
+|    +--- :leaf1 (org.gradle.api.DefaultTask)
+|    \\--- :middle (org.gradle.api.DefaultTask)
+|         +--- :leaf1 (org.gradle.api.DefaultTask) (*)
+|         \\--- :leaf2 (org.gradle.api.DefaultTask)
+\\--- :root2 (org.gradle.api.DefaultTask)
+     \\--- other build task :included:fromIncluded (org.gradle.api.DefaultTask)
 
 (*) - details omitted (listed previously)
 """)
@@ -149,8 +157,8 @@ Tasks graph for: root r2
         then:
         outputContains("""
 Tasks graph for: root
-\\--- :root
-     \\--- :leaf1
+\\--- :root (org.gradle.api.DefaultTask)
+     \\--- :leaf1 (org.gradle.api.DefaultTask)
 """)
     }
 
@@ -175,31 +183,37 @@ Tasks graph for: root
         then:
         outputContains("""
 Tasks graph for: root
-\\--- :root
-     +--- :leaf1
-     \\--- :middle
-          +--- :leaf1 (*)
-          \\--- :leaf2
+\\--- :root (org.gradle.api.DefaultTask)
+     +--- :leaf1 (org.gradle.api.DefaultTask)
+     \\--- :middle (org.gradle.api.DefaultTask, disabled)
+          +--- :leaf1 (org.gradle.api.DefaultTask) (*)
+          \\--- :leaf2 (org.gradle.api.DefaultTask)
 
 (*) - details omitted (listed previously)
 """)
     }
 
-    def "can handle mustRunAfter and finalizedBy"() {
+    def "ignores mustRunAfter and shouldRunAfter but displays finalizations"() {
         given:
         settingsFile """rootProject.name = 'my-root'"""
         buildFile """
             def leaf1 = tasks.register("leaf1")
             def leaf2 = tasks.register("leaf2")
+            def leaf3 = tasks.register("leaf3")
+            def leaf4 = tasks.register("leaf4"){
+                dependsOn(leaf3)
+            }
             def middle = tasks.register("middle"){
                 dependsOn(leaf1, leaf2)
+                shouldRunAfter(leaf3)
             }
             tasks.register("root"){
-                mustRunAfter(leaf1)
+                dependsOn(middle)
+                mustRunAfter(leaf4)
             }
             tasks.register("root2"){
                 dependsOn(leaf1)
-                finalizedBy(leaf2)
+                finalizedBy(leaf4)
             }
         """
 
@@ -209,11 +223,14 @@ Tasks graph for: root
         then:
         outputContains("""
 Tasks graph for: root root2
-+--- :root
-|    +--- :leaf1
-|    \\--- :leaf1 (*)
-\\--- :root2
-     \\--- :leaf1 (*)
++--- :root (org.gradle.api.DefaultTask)
+|    \\--- :middle (org.gradle.api.DefaultTask)
+|         +--- :leaf1 (org.gradle.api.DefaultTask)
+|         \\--- :leaf2 (org.gradle.api.DefaultTask)
+\\--- :root2 (org.gradle.api.DefaultTask)
+     +--- :leaf1 (org.gradle.api.DefaultTask) (*)
+     \\--- :leaf4 (org.gradle.api.DefaultTask, finalizer)
+          \\--- :leaf3 (org.gradle.api.DefaultTask)
 
 (*) - details omitted (listed previously)
 """)
@@ -242,12 +259,12 @@ Tasks graph for: root root2
         then:
         outputContains("""
 Tasks graph for: clean root
-+--- :clean
-\\--- :root
-     +--- :leaf1
-     \\--- :middle
-          +--- :leaf1 (*)
-          \\--- :leaf2
++--- :clean (org.gradle.api.tasks.Delete)
+\\--- :root (org.gradle.api.DefaultTask)
+     +--- :leaf1 (org.gradle.api.DefaultTask)
+     \\--- :middle (org.gradle.api.DefaultTask)
+          +--- :leaf1 (org.gradle.api.DefaultTask) (*)
+          \\--- :leaf2 (org.gradle.api.DefaultTask)
 
 (*) - details omitted (listed previously)
 """)
@@ -276,14 +293,12 @@ Tasks graph for: clean root
         then:
         outputContains("""
 Tasks graph for: clean root
-+--- :clean
-\\--- :root
-     +--- :leaf1
-     \\--- :middle
-          +--- :compileJava
-          |    \\--- destroyer locations for task group 0
-          |         \\--- Resolve mutations for :clean
-          \\--- :leaf2
++--- :clean (org.gradle.api.tasks.Delete)
+\\--- :root (org.gradle.api.DefaultTask)
+     +--- :leaf1 (org.gradle.api.DefaultTask)
+     \\--- :middle (org.gradle.api.DefaultTask)
+          +--- :compileJava (org.gradle.api.tasks.compile.JavaCompile)
+          \\--- :leaf2 (org.gradle.api.DefaultTask)
 """)
     }
 
@@ -315,8 +330,8 @@ Tasks graph for: clean root
         then:
         outputContains("""
 Tasks graph for: consumeFile
-\\--- :consumeFile
-     \\--- :generateFile
+\\--- :consumeFile (org.gradle.api.DefaultTask)
+     \\--- :generateFile (org.gradle.api.DefaultTask)
 """)
     }
 }
