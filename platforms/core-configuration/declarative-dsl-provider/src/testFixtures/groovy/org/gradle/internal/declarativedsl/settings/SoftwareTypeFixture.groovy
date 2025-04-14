@@ -16,7 +16,7 @@
 
 package org.gradle.internal.declarativedsl.settings
 
-import org.gradle.api.internal.plugins.SoftwareFeatureDslBinding
+import org.gradle.api.internal.plugins.SoftwareFeatureBinding
 import org.gradle.api.internal.plugins.software.RegistersSoftwareTypes
 import org.gradle.api.internal.plugins.software.SoftwareType
 import org.gradle.test.fixtures.plugin.PluginBuilder
@@ -395,10 +395,10 @@ trait SoftwareTypeFixture {
             import org.gradle.api.provider.Property;
             import org.gradle.api.tasks.Nested;
             import ${SoftwareType.class.name};
-            import ${SoftwareFeatureDslBinding.class.name};
+            import ${SoftwareFeatureBinding.class.name};
             import javax.inject.Inject;
 
-            import static ${SoftwareFeatureDslBinding.class.name}.softwareType;
+            import static ${SoftwareFeatureBinding.class.name}.softwareType;
 
             abstract public class ${softwareTypePluginClassName} implements Plugin<Project> {
 

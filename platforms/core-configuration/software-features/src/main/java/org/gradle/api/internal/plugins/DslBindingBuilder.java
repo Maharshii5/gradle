@@ -19,5 +19,5 @@ package org.gradle.api.internal.plugins;
 public interface DslBindingBuilder {
     <V> DslBindingBuilder withImplementationType(Class<V> implementationType);
 
-    SoftwareFeatureDslBinding build();
+    SoftwareFeatureBinding build();
 }

@@ -17,13 +17,13 @@
 package org.gradle.plugin.software.internal;
 
 import org.gradle.api.Action;
-import org.gradle.api.internal.plugins.SoftwareFeatureDslBindingBuilder;
+import org.gradle.api.internal.plugins.SoftwareFeatureBindingBuilder;
 import org.gradle.api.internal.plugins.SoftwareFeatureTransform;
 import org.gradle.util.Path;
 
-public class DefaultSoftwareFeatureDslBindingBuilder extends AbstractDslBindingBuilder implements SoftwareFeatureDslBindingBuilder {
+public class DefaultSoftwareFeatureBindingBuilder extends AbstractDslBindingBuilder implements SoftwareFeatureBindingBuilder {
     @Override
-    public <T, U, V> SoftwareFeatureDslBindingBuilder bind(String name, Class<T> dslType, Class<U> bindingTargetType, Class<V> buildModelType, SoftwareFeatureTransform<T, U, V> transform) {
+    public <T, U, V> SoftwareFeatureBindingBuilder bind(String name, Class<T> dslType, Class<U> bindingTargetType, Class<V> buildModelType, SoftwareFeatureTransform<T, U, V> transform) {
         this.path = Path.path(name);
         this.dslType = dslType;
         this.bindingTargetType = bindingTargetType;
@@ -32,7 +32,7 @@ public class DefaultSoftwareFeatureDslBindingBuilder extends AbstractDslBindingB
         return this;
     }
 
-    public SoftwareFeatureDslBindingBuilder apply(Action<SoftwareFeatureDslBindingBuilder> configuration) {
+    public SoftwareFeatureBindingBuilder apply(Action<SoftwareFeatureBindingBuilder> configuration) {
         configuration.execute(this);
         return this;
     }

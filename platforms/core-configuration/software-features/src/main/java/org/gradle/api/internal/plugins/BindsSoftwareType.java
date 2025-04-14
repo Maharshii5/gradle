@@ -16,6 +16,16 @@
 
 package org.gradle.api.internal.plugins;
 
-public interface SoftwareFeatureDslBindingBuilder extends DslBindingBuilder {
-    <T, U, V> SoftwareFeatureDslBindingBuilder bind(String name, Class<T> dslType, Class<U> bindingTargetType, Class<V> buildModelType, SoftwareFeatureTransform<T, U, V> transform);
+import org.gradle.api.Incubating;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Incubating
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface BindsSoftwareType {
+    Class<? extends SoftwareTypeBindingRegistration> value();
 }

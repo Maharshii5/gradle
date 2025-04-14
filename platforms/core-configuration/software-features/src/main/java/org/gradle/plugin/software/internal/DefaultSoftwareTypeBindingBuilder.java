@@ -18,13 +18,13 @@ package org.gradle.plugin.software.internal;
 
 import org.gradle.api.Project;
 import org.gradle.api.internal.plugins.SoftwareFeatureApplicationContext;
-import org.gradle.api.internal.plugins.SoftwareTypeDslBindingBuilder;
+import org.gradle.api.internal.plugins.SoftwareTypeBindingBuilder;
 import org.gradle.api.internal.plugins.SoftwareTypeTransform;
 import org.gradle.util.Path;
 
-public class DefaultSoftwareTypeDslBindingBuilder extends AbstractDslBindingBuilder implements SoftwareTypeDslBindingBuilder {
+public class DefaultSoftwareTypeBindingBuilder extends AbstractDslBindingBuilder implements SoftwareTypeBindingBuilder {
     @Override
-    public <T, U> SoftwareTypeDslBindingBuilder bind(String name, Class<T> dslType, Class<U> buildModelType, SoftwareTypeTransform<T, U> transform) {
+    public <T, U> SoftwareTypeBindingBuilder bind(String name, Class<T> dslType, Class<U> buildModelType, SoftwareTypeTransform<T, U> transform) {
         this.path = Path.path(name);
         this.dslType = dslType;
         this.buildModelType = buildModelType;

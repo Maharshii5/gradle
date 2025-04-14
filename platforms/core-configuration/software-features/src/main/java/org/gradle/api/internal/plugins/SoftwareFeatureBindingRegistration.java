@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-plugins {
-    id("gradlebuild.distribution.implementation-kotlin")
+package org.gradle.api.internal.plugins;
+
+public interface SoftwareFeatureBindingRegistration {
+    void bind(SoftwareFeatureBindingBuilder builder);
 }
-
-description = "Implementation of Software Features and Types"
-
-dependencies {
-    api(projects.coreApi)
-    api(projects.modelCore)
-    api(projects.stdlibJavaExtensions)
-
-    api(libs.inject)
-    api(libs.jspecify)
-
-    implementation(projects.softwareFeaturesApi)
-
-    implementation(libs.groovy)
-}
-

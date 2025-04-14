@@ -17,7 +17,7 @@
 package org.gradle.plugin.software.internal;
 
 import org.gradle.api.internal.plugins.DslBindingBuilder;
-import org.gradle.api.internal.plugins.SoftwareFeatureDslBinding;
+import org.gradle.api.internal.plugins.SoftwareFeatureBinding;
 import org.gradle.api.internal.plugins.SoftwareFeatureTransform;
 import org.gradle.internal.Cast;
 import org.gradle.util.Path;
@@ -33,8 +33,8 @@ abstract public class AbstractDslBindingBuilder implements DslBindingBuilder {
     @Nullable private Class<?> implementationType;
     @Nullable protected SoftwareFeatureTransform<?, ?, ?> transform;
 
-    private static <T> SoftwareFeatureDslBinding bindingOf(Class<T> dslType, @Nullable Class<? extends T> implementationType, Path path, Class<?> bindingTargetType, Class<?> buildModelType, SoftwareFeatureTransform<T, ?, ?> transform) {
-        return new SoftwareFeatureDslBinding() {
+    private static <T> SoftwareFeatureBinding bindingOf(Class<T> dslType, @Nullable Class<? extends T> implementationType, Path path, Class<?> bindingTargetType, Class<?> buildModelType, SoftwareFeatureTransform<T, ?, ?> transform) {
+        return new SoftwareFeatureBinding() {
             @Override
             public Class<?> getBindingTargetType() {
                 return bindingTargetType;
@@ -74,7 +74,7 @@ abstract public class AbstractDslBindingBuilder implements DslBindingBuilder {
     }
 
     @Override
-    public SoftwareFeatureDslBinding build() {
+    public SoftwareFeatureBinding build() {
         if (dslType == null) {
             throw new IllegalStateException("No binding has been specified please call bind() first");
         }

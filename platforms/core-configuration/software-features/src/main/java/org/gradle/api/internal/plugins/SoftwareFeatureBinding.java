@@ -16,6 +16,15 @@
 
 package org.gradle.api.internal.plugins;
 
-public interface SoftwareTypeDslBindingBuilder extends DslBindingBuilder {
-    <T, U> SoftwareTypeDslBindingBuilder bind(String name, Class<T> dslType, Class<U> buildModelType, SoftwareTypeTransform<T, U> transform);
+import org.gradle.util.Path;
+
+import java.util.Optional;
+
+public interface SoftwareFeatureBinding {
+    Class<?> getBindingTargetType();
+    Class<?> getDslType();
+    Optional<Class<?>> getImplementationType();
+    Class<?> getBuildModelType();
+    Path getPath();
+    SoftwareFeatureTransform<?, ?, ?> getTransform();
 }

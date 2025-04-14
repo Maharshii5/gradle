@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-plugins {
-    id("gradlebuild.distribution.implementation-kotlin")
+package org.gradle.api.internal.plugins;
+
+import org.gradle.api.Incubating;
+
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+@Incubating
+@Target({ElementType.TYPE})
+@Retention(RetentionPolicy.RUNTIME)
+public @interface BindsSoftwareFeature {
+    Class<? extends SoftwareFeatureBindingRegistration> value();
 }
-
-description = "Implementation of Software Features and Types"
-
-dependencies {
-    api(projects.coreApi)
-    api(projects.modelCore)
-    api(projects.stdlibJavaExtensions)
-
-    api(libs.inject)
-    api(libs.jspecify)
-
-    implementation(projects.softwareFeaturesApi)
-
-    implementation(libs.groovy)
-}
-

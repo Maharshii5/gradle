@@ -14,22 +14,8 @@
  * limitations under the License.
  */
 
-plugins {
-    id("gradlebuild.distribution.implementation-kotlin")
+package org.gradle.api.internal.plugins;
+
+public interface SoftwareTypeBindingBuilder extends DslBindingBuilder {
+    <T, U> SoftwareTypeBindingBuilder bind(String name, Class<T> dslType, Class<U> buildModelType, SoftwareTypeTransform<T, U> transform);
 }
-
-description = "Implementation of Software Features and Types"
-
-dependencies {
-    api(projects.coreApi)
-    api(projects.modelCore)
-    api(projects.stdlibJavaExtensions)
-
-    api(libs.inject)
-    api(libs.jspecify)
-
-    implementation(projects.softwareFeaturesApi)
-
-    implementation(libs.groovy)
-}
-
