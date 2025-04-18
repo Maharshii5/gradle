@@ -237,8 +237,9 @@ class ProjectConfigurationChildrenProgressCrossVersionSpec extends AbstractProgr
 
         settingsFile << """
             rootProject.name = 'root'
-            include 'a'
         """.stripIndent()
+
+        setupProjectDirs("a")
         buildFile << """
             allprojects {
                 apply plugin:'java'
@@ -304,8 +305,9 @@ class ProjectConfigurationChildrenProgressCrossVersionSpec extends AbstractProgr
         given:
         settingsFile << """
             rootProject.name = 'multi'
-            include 'a', 'b'
         """
+        setupProjectDirs("a", "b")
+
         buildFile << """
             allprojects { apply plugin: 'java' }
             dependencies {
