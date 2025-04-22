@@ -215,7 +215,6 @@ abstract class ToolingApiClientJdkCompatibilityTest extends AbstractIntegrationS
 
     abstract JavaVersion getClientJdkVersion()
 
-    @Flaky
     def "tapi client can launch task with Gradle and Java combination"(JavaVersion gradleDaemonJdkVersion, String gradleVersion) {
         setup:
         def gradleDaemonJdk = AvailableJavaHomes.getJdk(gradleDaemonJdkVersion)
@@ -245,7 +244,6 @@ abstract class ToolingApiClientJdkCompatibilityTest extends AbstractIntegrationS
         JavaVersion.VERSION_1_8 | "7.6.4"
     }
 
-    @Flaky
     def "tapi client can run build action with Gradle and Java combination"(JavaVersion gradleDaemonJdkVersion, String gradleVersion) {
         setup:
         def gradleDaemonJdk = AvailableJavaHomes.getJdk(gradleDaemonJdkVersion)
@@ -271,7 +269,6 @@ abstract class ToolingApiClientJdkCompatibilityTest extends AbstractIntegrationS
         JavaVersion.VERSION_1_8 | "7.6.4"
     }
 
-    @Flaky
     def "tapi client cannot run build action with Gradle and Java combination"(JavaVersion gradleDaemonJdkVersion, String gradleVersion) {
         setup:
         def gradleDaemonJdk = AvailableJavaHomes.getJdk(gradleDaemonJdkVersion)
